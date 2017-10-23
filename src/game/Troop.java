@@ -9,5 +9,9 @@ public abstract class Troop {
 		
 	
 	}
+	
+	public Vector getPos() {
+		return pos;
+	}
 
 }

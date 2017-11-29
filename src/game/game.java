@@ -231,6 +231,8 @@ public int[] getLivingTroops(int player){
 		troopPositions[i] += livingUnits.get(i).getX();
 		troopPositions[i] += livingUnits.get(i).getY();
 		
+		
+	
 	}
 	return troopPositions;
 }

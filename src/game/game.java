@@ -224,4 +224,18 @@ public ArrayList<soldier> getBoard(){
 }
 
 
+public int[] getLivingTroops(int player){
+	ArrayList<soldier> livingUnits = playerTroops.get(player);
+	int[] troopPositions = new int[2 * livingUnits.size()];
+	for(int i = 0;i < livingUnits.size(); i++){
+		troopPositions[i] += livingUnits.get(i).getX();
+		troopPositions[i] += livingUnits.get(i).getY();
+		
+	}
+	return troopPositions;
+}
+
+
+
+
 }

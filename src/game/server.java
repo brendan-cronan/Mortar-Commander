@@ -26,6 +26,7 @@ public class server {
 				
 				
 				
+				
 			}
 		
 		
@@ -60,6 +61,8 @@ public class clientHandler implements Runnable{
 			
 			
 			
+			
+		}catch(Exception e){
 			
 		}
 		

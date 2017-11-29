@@ -1,4 +1,4 @@
-package network;
+package game;
 import java.io.*;
 import java.net.*;
 import java.util.*;

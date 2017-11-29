@@ -1,3 +1,4 @@
+
 package game;
 
 import java.awt.GridBagConstraints;
@@ -77,3 +78,4 @@ public class Window extends JPanel{
 	}
 
 }
+

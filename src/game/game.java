@@ -8,7 +8,7 @@ public class game {
 	private boolean gameOn;
 	private soldier[][] board;
 	private final int STARTING_TROOP_COUNT = 3;
-	private final int BOARD_SIZE = 20;
+	final int BOARD_SIZE = 20;
 	private Random r;
 	
 	public ArrayList<soldier> getAllTroops(){

@@ -18,7 +18,9 @@ public class server {
 			while (true) {
 				player = welcome.accept();
 				System.out.println("connected successfully");
+
 				numPlayers++;
+
 
 			}
 
@@ -41,6 +43,7 @@ class clientHandler implements Runnable {
 	public clientHandler(Socket socket, int playerNum) {
 		this.playerNum = playerNum;
 		player = socket;
+
 	}
 
 	public void run() {

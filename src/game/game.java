@@ -223,6 +223,7 @@ public int checkWinner(){
 		}
 	}
 	if(countPlayers == 1){
+		gameOn = false;
 		return potentialWinner;
 	}
 	return -1;
@@ -247,7 +248,7 @@ public int[] getLivingTroops(int player){
 	return troopPositions;
 }
 
-<<<<<<< HEAD
+
 public boolean getLocationStatus(int x, int y){
 	//returns true if location is empty, false if location is filled
 	if(board[x][y] == null){
@@ -264,7 +265,4 @@ public soldier getTroop(int x, int y){
 
 
 
-=======
-
->>>>>>> branch 'danGameLogic' of https://github.com/brendan-cronan/Mortar-Commander.git
 }

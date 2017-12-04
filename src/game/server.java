@@ -39,7 +39,7 @@ public class server {
 				
 
 			}
-
+		board.NumPlayers(players);
 		board.placeTroopsBoring();
 		int winner = board.checkWinner();
 		while(winner < 0){
@@ -55,8 +55,6 @@ public class server {
 		}
 		
 		
-		
-		
 	}catch(Exception e){
 		
 
@@ -64,7 +62,6 @@ public class server {
 
 }
 }
-
 
 
 
@@ -97,6 +94,11 @@ class ClientHandler implements Runnable{
 		
 		while(running){
 			try{
+				if(playerNumber == server.playerTurn && server.board.getLivingTroops(playerNumber).length > 0){
+					playing = true;
+					startPlayerTurn();
+					
+				}
 				
 				command = Net_Util.recString(player).split(" ");
 				//has the game started yet? if not, let's check if this player
@@ -105,9 +107,13 @@ class ClientHandler implements Runnable{
 					server.playerReady++;
 				}
 				if(playerNumber == server.playerTurn && server.board.getLivingTroops(playerNumber).length > 0){
-					playing = true;
+					//playing = true;
+					//startPlayerTurn();
+					
+					
 				//each player will get three actions (move or attack) regardless 
 				//of the number of troops
+					for(int x = 0; x < 3; x++){
 					if(command[0].startsWith("move")){
 						int[] coordinates = new int[command.length - 2];
 						for(int i = 0; i < command.length; i++ ){
@@ -134,6 +140,8 @@ class ClientHandler implements Runnable{
 						}
 						server.board.attack(coordinates[1], coordinates[2]);
 
+					}		
+					command = Net_Util.recString(player).split(" ");
 					}
 
 				}else if(server.board.getLivingTroops(playerNumber).length == 0){
@@ -149,18 +157,8 @@ class ClientHandler implements Runnable{
 	
 	public void startPlayerTurn(){
 		Net_Util.send(player, server.board.checkWinner() < 0);
-		Net_Util.send(player, server.board.getLivingTroops(playerNumber));
-			
-		
-		
-		
-		
+		Net_Util.send(player, server.board.getLivingTroops(playerNumber));	
 	}
-	
-	
-	
-	
-	
 }
 
 

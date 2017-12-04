@@ -19,7 +19,7 @@ public class game {
 		return playerTroops;
 	}
 	
-	public game(boolean crazy){
+	public game(){
 		playerTurn = 1;
 		gameOn = true;
 		board = new soldier[BOARD_SIZE][BOARD_SIZE];
@@ -162,7 +162,7 @@ public boolean move(soldier troop, int x, int y){
 
 
 
-public ArrayList<soldier> lineOfSight(soldier troop){
+public int[] lineOfSight(soldier troop){
 	ArrayList<soldier> enemies = new ArrayList<soldier>();
 	for(int x = troop.getX() - troop.getSight(); x < troop.getX() + troop.getSight(); x++){
 		
@@ -175,7 +175,17 @@ public ArrayList<soldier> lineOfSight(soldier troop){
 			}
 		}
 	}
-	return enemies;
+	ArrayList<Integer> sights = new ArrayList<Integer>();
+	for(soldier enemy: enemies){
+		sights.add(enemy.getX());
+		sights.add(enemy.getY());
+	}
+	
+	int[] positiveSightings = new int[sights.size()];
+	for(int i = 0; i < sights.size(); i++){
+		positiveSightings[i] = sights.get(i);
+	}
+	return positiveSightings;
 }
 	
 
@@ -235,6 +245,19 @@ public int[] getLivingTroops(int player){
 	
 	}
 	return troopPositions;
+}
+
+public boolean getLocationStatus(int x, int y){
+	//returns true if location is empty, false if location is filled
+	if(board[x][y] == null){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+public soldier getTroop(int x, int y){
+	return board[x][y];
 }
 
 

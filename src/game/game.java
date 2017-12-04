@@ -8,7 +8,7 @@ public class game {
 	private boolean gameOn;
 	private soldier[][] board;
 	private final int STARTING_TROOP_COUNT = 3;
-	private final int BOARD_SIZE = 20;
+	final int BOARD_SIZE = 20;
 	private Random r;
 	
 	public ArrayList<soldier> getAllTroops(){
@@ -247,6 +247,7 @@ public int[] getLivingTroops(int player){
 	return troopPositions;
 }
 
+<<<<<<< HEAD
 public boolean getLocationStatus(int x, int y){
 	//returns true if location is empty, false if location is filled
 	if(board[x][y] == null){
@@ -263,4 +264,7 @@ public soldier getTroop(int x, int y){
 
 
 
+=======
+
+>>>>>>> branch 'danGameLogic' of https://github.com/brendan-cronan/Mortar-Commander.git
 }

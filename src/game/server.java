@@ -4,9 +4,10 @@ import java.net.*;
 import java.util.ArrayList;
 
 public class server {
-	private final static int  PORT = 6603;
+	private final static int PORT = 6603;
 	private static ServerSocket welcome;
 	private static Socket player;
+
 	public static int playerTurn = 0;
 	public static int playerReady = 0;
 	private static int players = 0;
@@ -16,10 +17,12 @@ public class server {
 	public static void main(String args[]){
 		ArrayList<ClientHandler> playerList = new ArrayList<ClientHandler>();
 		try{
+
 			welcome = new ServerSocket(PORT);
-			while(true){
+			while (true) {
 				player = welcome.accept();
 				System.out.println("connected successfully");
+
 				ClientHandler handler = new ClientHandler(player, players);
 				playerList.add(handler);
 
@@ -34,7 +37,9 @@ public class server {
 				}
 				
 				
+
 			}
+
 		board.placeTroopsBoring();
 		int winner = board.checkWinner();
 		while(winner < 0){
@@ -54,40 +59,30 @@ public class server {
 		
 	}catch(Exception e){
 		
+
 	}
-	
 
 }
-	
-	
-	
 }
+
+
 
 
 class ClientHandler implements Runnable{
 	boolean playing = false;
+
 	Socket player;
 	String playerName;
 	int port;
+
 	int playerNumber;
 	public ClientHandler(Socket socket, int playerNum){
 		playerNumber = playerNum;
+
 		player = socket;
-		try{
-			
-			
-			
-			
-			
-			
-			
-			
-		}catch(Exception e){
-			
-		}
-		
-		
+
 	}
+
 	
 	public boolean getPlaying(){
 		return playing;
@@ -167,3 +162,5 @@ class ClientHandler implements Runnable{
 	
 	
 }
+
+

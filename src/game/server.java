@@ -26,6 +26,7 @@ public class server {
 				new Thread(handler).start();
 				players++;
 					
+				//this should allow us to start a new game once everyone has selected that they are ready
 				if(playerReady > 0 && playerReady == players){
 					board = new game();
 					gameOn = true;
@@ -155,6 +156,9 @@ class ClientHandler implements Runnable{
 		Net_Util.send(player, server.board.checkWinner() < 0);
 		Net_Util.send(player, server.board.getLivingTroops(playerNumber));
 			
+		
+		
+		
 		
 	}
 	

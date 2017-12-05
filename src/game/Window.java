@@ -76,8 +76,10 @@ public class Window extends JPanel {
 		board = new JButton[sizeOfBoard][sizeOfBoard];
 		buttonListener = new ButtonListener();
 		setLayout(new GridLayout(sizeOfBoard, sizeOfBoard));
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[i].length; j++) {
+		
+		//tried switching i and j
+		for (int j = 0; j < board.length; j++) {
+			for (int i = 0; i < board[j].length; i++) {
 				board[i][j] = new JButton();
 				board[i][j].addActionListener(buttonListener);
 				board[i][j].setActionCommand(i + " " + j);
@@ -122,8 +124,8 @@ public class Window extends JPanel {
 		window = new Window();
 		
 		boolean gameOn = true;
-		int[] rawPlayerTroops = null;
-		int[] rawEnemyTroops = null;
+		String[] rawPlayerTroops = null;
+		String[] rawEnemyTroops = new String[1];
 		playerTroops = new ArrayList<int[]>();
 		updated = false;
 		isMove = false;
@@ -142,16 +144,22 @@ public class Window extends JPanel {
 				}
 				//gameOn = Net_Util.recBool(serverSocket);
 				System.out.println("recieved gameOn as " + gameOn);
+				
+				
+				
 			} catch (IOException e) {
 				System.out.println("Failed to receive boolean from server");
 				e.printStackTrace();
 				break;
 			}
 			
+			
+			
+			
 			// get new list of player troops
 			try {
 				System.out.println("trying to receive int array");
-				rawPlayerTroops = Net_Util.recIntArr(serverSocket);
+				rawPlayerTroops = Net_Util.recStrArr(serverSocket);
 				System.out.println("Received player troops");
 			} catch (IOException e) {
 				System.out.println("Failed to recieve own troop coordinates from server");
@@ -160,23 +168,37 @@ public class Window extends JPanel {
 			}
 			playerTroops.clear();
 			for(int i = 0; i < rawPlayerTroops.length; i+=2){
-				int[] troop = { rawPlayerTroops[i], rawPlayerTroops[i+1] };
+				int[] troop = { Integer.parseInt(rawPlayerTroops[i]), Integer.parseInt(rawPlayerTroops[i+1]) };
 				playerTroops.add(troop);
 			}
 			
+			
+			
+			
+			
+			
 			// get new list of enemy troops
 			try {
-				rawEnemyTroops = Net_Util.recIntArr(serverSocket);
+				rawEnemyTroops = Net_Util.recStrArr(serverSocket);
 				System.out.println("Reicieved enemy troops");
 			} catch (IOException e) {
 				System.out.println("Failed to recieve initial enemy troop coordinates from server");
 				e.printStackTrace();
 				break;
 			}
+			try{
+			if(enemyTroops.size() > 0){
 			enemyTroops.clear();
+			}
+			
 			for(int i = 0; i < rawEnemyTroops.length; i+=2){
-				int[] troop = { rawEnemyTroops[i], rawEnemyTroops[i+1] };
+				if(!(Integer.parseInt(rawEnemyTroops[i]) == -1)){
+				int[] troop = { Integer.parseInt(rawEnemyTroops[i]), Integer.parseInt(rawEnemyTroops[i+1]) };
 				enemyTroops.add(troop);
+				}
+			}
+			}catch(Exception e){
+				System.out.println("No enemies Detected");
 			}
 			
 			// update the board
@@ -194,10 +216,10 @@ public class Window extends JPanel {
 				// if a troop moved, update emeny troops
 				if(isMove){
 					try {
-						rawEnemyTroops = Net_Util.recIntArr(serverSocket);
+						rawEnemyTroops = Net_Util.recStrArr(serverSocket);
 						enemyTroops.clear();
 						for(int i = 0; i < rawEnemyTroops.length; i+=2){
-							int[] troop = { rawEnemyTroops[i], rawEnemyTroops[i+1] };
+							int[] troop = {Integer.parseInt(rawEnemyTroops[i]), Integer.parseInt(rawEnemyTroops[i+1]) };
 							enemyTroops.add(troop);
 						}
 					} catch (IOException e) {
@@ -220,15 +242,7 @@ public class Window extends JPanel {
 
 		public Client() {
 
-			// list of user's troops
-			/*
-			playerTroops = new ArrayList<soldier>();
-			playerTroops.add(new soldier(3, 1, 3, 5, 5));
-			enemyTroops = new ArrayList<soldier>();
-			enemyTroops.add(new soldier(3, 1, 3, 7, 7));
-			*/
-
-			//updateButtons();
+			
 
 		}
 
@@ -243,23 +257,40 @@ public class Window extends JPanel {
 			}
 
 			// set color and enabled of JButtons
-			for (int h = 0; h < playerTroops.size(); h+=2) {
+			for (int h = 0; h < playerTroops.size(); h++) {
+				System.out.println("Player has " + playerTroops.size() + " troops");
 				int x = playerTroops.get(h)[0];
-				int y = playerTroops.get(h+1)[1];
+				//changed h+1 to h
+				int y = playerTroops.get(h)[1];
 				board[x][y].setBackground(Color.GREEN);
 				board[x][y].setEnabled(true);
 				int troopSight = 3;
+				
+				
 				for (int i = troopSight; i >= (-1 * troopSight); i--) {
 					for (int j = troopSight; j >= (-1 * troopSight); j--) {
-						if (x + i < sizeOfBoard && y + j < sizeOfBoard && x + i >= 0 && y + j >= 0) {
+						if(i == 0 && j == 0){
+							
+						}else if (x + i < sizeOfBoard && y + j < sizeOfBoard && x + i >= 0 && y + j >= 0) {
+							if(theGame.checkValid(x + i) && theGame.checkValid(y + j)){
 							board[x + i][y + j].setEnabled(true);
-							int[] coords = { x+i, y+i };
+							int[] coords = { x+i, y+j };
+							try{
 							if (enemyTroops.contains(coords)) {
-								board[x + i][y + i].setBackground(Color.RED);
-							} else if (playerTroops.contains(coords)) {
-								board[x + i][y + i].setBackground(Color.GREEN);
+								board[x + i][y + j].setBackground(Color.RED);
+							} 
+							}catch(Exception e){
+								System.out.println("No enemies to show");
+							}
+							if (playerTroops.contains(coords)) {
+								board[x + i][y + j].setBackground(Color.GREEN);
 							} else {
-								board[x + i][y + i].setBackground(null);
+								System.out.println(x + i);
+								System.out.println(y + j);
+								if(board[x + i][y + j].getBackground() != Color.GREEN && board[x + i][y + j].getBackground() != Color.RED){
+								board[x + i][y + j].setBackground(null);
+								}
+							}
 							}
 						}
 					}
@@ -279,29 +310,64 @@ public class Window extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if(actions > 0){
+				System.out.println("This player has " + playerTroops.size() + " troops at the following coordinates: ");
+				for(int[] troop: playerTroops){
+					System.out.print(troop[0] + " ");
+					System.out.println(troop[1]);
+					
+					
+				}
+				System.out.println("");
+				
 				System.out.println(arg0.getActionCommand());
 				String[] command = arg0.getActionCommand().split(" ");
-				int[] coords = { fromx, fromy };
+				//moved fromx and fromy from under the firstClick if to above it here
+				
+				//System.out.println(fromx + " is x, and y is " + fromy);
+				//int[] coords = { fromx, fromy };
 				if (firstClick) {
 					fromx = Integer.parseInt(command[0]);
 					fromy = Integer.parseInt(command[1]);
+					/*
 					if (playerTroops.contains(coords)) {
 						firstClick = false;
+						System.out.println("You clicked your troop");
 					} else {
 						window.updateMessage("Select one of your own troops");
 					}
+					*/
+					for(int[] trooper: playerTroops){
+						if(trooper[0] == fromx && trooper[1] == fromy){
+							firstClick = false;
+							System.out.println("You clicked your troop");
+						}
+					}
+					if(firstClick){
+						window.updateMessage("Select one of your own troops");
+					}
 				} else {
+					
 					tox = Integer.parseInt(command[0]);
 					toy = Integer.parseInt(command[1]);
-					if (enemyTroops.contains(coords)) {
-						String serverCommand =  "attack " + fromx + " " + fromy + " " + tox + " " + toy;
-						Net_Util.send(serverSocket, serverCommand);
-					} else if(playerTroops.contains(coords)){
-						window.updateMessage("Don't attack your own troops");
-					} else {
+					try{
+						for(int[] trooper: enemyTroops){
+							if(trooper[0] == fromx && trooper[1] == fromy){
+								String serverCommand =  "attack " + fromx + " " + fromy + " " + tox + " " + toy;
+								Net_Util.send(serverSocket, serverCommand);
+							}
+						}
+					
+					}catch(Exception e){
+						
+					}
+					for(int[] trooper: playerTroops){
+						if(trooper[0] == fromx && trooper[1] == fromy){
+							window.updateMessage("Don't attack your own troops");
+						}else {
 						String serverCommand =  "move " + fromx + " " + fromy + " " + tox + " " + toy;
 						Net_Util.send(serverSocket, serverCommand);
 						isMove = true;
+					}
 					}
 					firstClick = true;
 					updated = true;

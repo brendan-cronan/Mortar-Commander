@@ -27,16 +27,9 @@ public class server {
 
 			welcome = new ServerSocket(PORT);
 			
-			while (partySize > players) {
-				
-				
+			while (partySize > players) {		
 				
 				player = welcome.accept();
-				
-				
-
-				
-				
 				System.out.println("connected successfully");
 
 				ClientHandler handler = new ClientHandler(player, players);
@@ -117,14 +110,7 @@ class ClientHandler implements Runnable {
 
 		while (running) {
 			try {
-				//System.out.print("Server.playerturn is " + server.playerTurn);
-				/*
-				if (server.gameOn &&  server.board.getLivingTroops(playerNumber).length > 0) {//removed playerNumber == server.playerTurn &&
-					playing = true;
-					//startPlayerTurn();
-
-				}
-				*/
+				
 
 				//command = Net_Util.recString(player).split(" ");
 				// has the game started yet? if not, let's check if this player
@@ -144,6 +130,7 @@ class ClientHandler implements Runnable {
 								if (i == 0) {
 
 								} else {
+									//skipping the first string in the array (move), we map each integer to coordinates
 									coordinates[i - 1] = Integer.parseInt(command[i]);
 								}
 								// once we create the board, here's where we'll
@@ -152,7 +139,13 @@ class ClientHandler implements Runnable {
 								// that soldier
 								soldier mover = server.board.getTroop(coordinates[0], coordinates[1]);
 								server.board.move(mover, coordinates[2], coordinates[3]);
-								Net_Util.send(player, server.board.lineOfSight(mover));
+								int[] LoS = server.board.lineOfSight(mover);
+								String[] spottedEnemies = new String[LoS.length];
+								for(int j = 0; j < LoS.length; j++){
+									spottedEnemies[j] = "" + LoS[j];
+								}
+								
+								Net_Util.send(player, spottedEnemies);
 							}
 						} else if (command[0].startsWith("attack")) {
 
@@ -206,12 +199,16 @@ class ClientHandler implements Runnable {
 		}
 		Net_Util.send(player, boolbool);
 		
-		System.out.println(" get living troops length " + server.board.getLivingTroops(playerNumber).length);
+		//System.out.println(" get living troops length " + server.board.getLivingTroops(playerNumber).length);
+		int[] liveTroops = server.board.getLivingTroops(playerNumber);
+		String[] troops = new String[liveTroops.length];
+		for(int i = 0; i < liveTroops.length; i++){
+			troops[i] = "" + liveTroops[i];
+		}
+		Net_Util.send(player, troops);
 		
-		Net_Util.send(player, server.board.getLivingTroops(playerNumber));
 		
-		
-		server.board.getPlayerTroops().get(playerNumber);
+		//server.board.getPlayerTroops().get(playerNumber);
 		
 		ArrayList<Integer> spottedEnemies = new ArrayList<Integer>();
 		for(soldier troop: server.board.getPlayerTroops().get(playerNumber)){
@@ -219,11 +216,11 @@ class ClientHandler implements Runnable {
 				spottedEnemies.add(x);
 			}
 		}
-		int[] spotted = new int[spottedEnemies.size()];
+		String[] spotted = new String[spottedEnemies.size()];
 		for(int i = 0; i < spottedEnemies.size(); i++){
-			spotted[i] = spottedEnemies.get(i);
+			spotted[i] = "" + spottedEnemies.get(i);
 		}
 		Net_Util.send(player, spotted);
-		System.out.println("finished starting their turn " + System.currentTimeMillis());
+		//System.out.println("finished starting their turn " + System.currentTimeMillis());
 	}
 }

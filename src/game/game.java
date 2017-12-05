@@ -44,7 +44,7 @@ public class game {
 	}
 	
 	
-	private boolean checkValid(int target){
+	public boolean checkValid(int target){
 		//0 and 400 are the borders of the game board
 		if(target < 0 || target > (BOARD_SIZE-1)){
 			return false;
@@ -185,6 +185,11 @@ public int[] lineOfSight(soldier troop){
 	for(int i = 0; i < sights.size(); i++){
 		positiveSightings[i] = sights.get(i);
 	}
+	
+	if(positiveSightings.length < 1){
+		positiveSightings[0] = -1;
+		positiveSightings[1] = -1;
+	}
 	return positiveSightings;
 }
 	
@@ -236,15 +241,19 @@ public ArrayList<soldier> getBoard(){
 
 
 public int[] getLivingTroops(int player){
-	ArrayList<soldier> livingUnits = playerTroops.get(player);
-	int[] troopPositions = new int[2 * livingUnits.size()];
-	for(int i = 0;i < livingUnits.size(); i++){
-		troopPositions[i] += livingUnits.get(i).getX();
-		troopPositions[i] += livingUnits.get(i).getY();
-		
-		
 	
+	ArrayList<soldier> livingUnits = playerTroops.get(player);
+	ArrayList<Integer> easyPeasy = new ArrayList<Integer>();
+	for(soldier x: livingUnits){
+		easyPeasy.add(x.getX());
+		easyPeasy.add(x.getY());
 	}
+	int[] troopPositions = new int[easyPeasy.size()];
+	for(int i = 0;i < troopPositions.length; i+= 2){
+		troopPositions[i] = easyPeasy.get(i);
+		troopPositions[i + 1] = easyPeasy.get(i + 1);
+	}
+	
 	return troopPositions;
 }
 

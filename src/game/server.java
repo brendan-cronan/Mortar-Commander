@@ -101,8 +101,7 @@ class ClientHandler implements Runnable {
 					server.playerReady++;
 				}
 				if (playerNumber == server.playerTurn && server.board.getLivingTroops(playerNumber).length > 0) {
-					// playing = true;
-					// startPlayerTurn();
+				
 
 					// each player will get three actions (move or attack)
 					// regardless
@@ -154,5 +153,17 @@ class ClientHandler implements Runnable {
 	public void startPlayerTurn() {
 		Net_Util.send(player, server.board.checkWinner() < 0);
 		Net_Util.send(player, server.board.getLivingTroops(playerNumber));
+		server.board.getPlayerTroops().get(playerNumber);
+		ArrayList<Integer> spottedEnemies = new ArrayList<Integer>();
+		for(soldier troop: server.board.getPlayerTroops().get(playerNumber)){
+			for(int x: server.board.lineOfSight(troop)){
+				spottedEnemies.add(x);
+			}
+		}
+		int[] spotted = new int[spottedEnemies.size()];
+		for(int i = 0; i < spottedEnemies.size(); i++){
+			spotted[i] = spottedEnemies.get(i);
+		}
+		Net_Util.send(player, spotted);
 	}
 }

@@ -4,23 +4,39 @@ import java.net.*;
 import java.util.ArrayList;
 
 public class server {
+	public static int SO_TIMEOUT =1000;
 	private final static int PORT = 6603;
 	private static ServerSocket welcome;
 	private static Socket player;
 
-	public static int playerTurn = 0;
-	public static int playerReady = 0;
+	public static volatile int playerTurn = 0;
+	public static volatile int playersReady = 0;
 	private static int players = 0;
 	public static boolean gameOn = false;
 	public static game board;
+	
+	public final static int partySize = 4;
+	
 
 	public static void main(String args[]) {
+		
+		
+		//playersReady = 0;
 		ArrayList<ClientHandler> playerList = new ArrayList<ClientHandler>();
 		try {
 
 			welcome = new ServerSocket(PORT);
-			while (true) {
+			
+			while (partySize > players) {
+				
+				
+				
 				player = welcome.accept();
+				
+				
+
+				
+				
 				System.out.println("connected successfully");
 
 				ClientHandler handler = new ClientHandler(player, players);
@@ -31,36 +47,50 @@ public class server {
 
 				// this should allow us to start a new game once everyone has
 				// selected that they are ready
-				if (playerReady > 0 && playerReady == players) {
-					board = new game();
-					gameOn = true;
-					break;
+				
+				
 				}
-
+			}catch(Exception e){
+				
 			}
+			//boolean playTurn = true;
+			board = new game();
+			gameOn = true;
+			System.out.println("game starting");
 			board.NumPlayers(players);
 			board.placeTroopsBoring();
 			int winner = board.checkWinner();
 			while (winner < 0) {
 				for (int i = 0; i < players; i++) {
+					
+					//System.out.print("it is currently this player's turn: " + i);
 					playerTurn = i;
-					while (playerList.get(i).getPlaying()) {
-
+					playerList.get(i).playing = true;
+					playerList.get(i).startPlayerTurn();
+					
+					//System.out.println(" Player whose turn it is: " + playerList.get(i).playerNumber);
+					while (playerList.get(i).playing) {
+						//System.out.print("is the player playing? " + playerList.get(i).playing);
+						System.out.print("");
+						
+						
 					}
 					winner = board.checkWinner();
 				}
+				//playTurn = true;
 
 			}
 
-		} catch (Exception e) {
-
-		}
-
+		
+	}
+	
+	public static void playersReady(){
+		playersReady++;
 	}
 }
 
 class ClientHandler implements Runnable {
-	boolean playing = false;
+	public boolean playing = false;
 
 	Socket player;
 	String playerName;
@@ -87,21 +117,22 @@ class ClientHandler implements Runnable {
 
 		while (running) {
 			try {
-				if (playerNumber == server.playerTurn && server.board.getLivingTroops(playerNumber).length > 0) {
+				//System.out.print("Server.playerturn is " + server.playerTurn);
+				/*
+				if (server.gameOn &&  server.board.getLivingTroops(playerNumber).length > 0) {//removed playerNumber == server.playerTurn &&
 					playing = true;
-					startPlayerTurn();
+					//startPlayerTurn();
 
 				}
+				*/
 
-				command = Net_Util.recString(player).split(" ");
+				//command = Net_Util.recString(player).split(" ");
 				// has the game started yet? if not, let's check if this player
 				// is ready to begin. If so, increment the number of ready
 				// players.
-				if (!server.gameOn && command[0].equalsIgnoreCase("ready")) {
-					server.playerReady++;
-				}
-				if (playerNumber == server.playerTurn && server.board.getLivingTroops(playerNumber).length > 0) {
-				
+				//System.out.println(" Server game on is " + server.gameOn);
+				if (server.gameOn && server.board.getLivingTroops(playerNumber).length > 0 && playing) {
+					command = Net_Util.recString(player).split(" ");
 
 					// each player will get three actions (move or attack)
 					// regardless
@@ -151,9 +182,37 @@ class ClientHandler implements Runnable {
 	}
 
 	public void startPlayerTurn() {
-		Net_Util.send(player, server.board.checkWinner() < 0);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.print("starting player's turn " + System.currentTimeMillis());
+		System.out.println(" check winner returns " +server.board.checkWinner());
+		System.out.println(" Player port number is " + player.getPort());
+		System.out.println(" Server port number is " + player.getLocalPort());
+		playing = true;
+		
+		/*
+		boolean gameContinue = server.board.checkWinner() < 0;
+		Net_Util.send(player, gameContinue);
+		*/
+		String boolbool;
+		if(!(server.board.checkWinner() < 0)){
+		 boolbool = "false";
+		}else{
+		boolbool = "true";
+		}
+		Net_Util.send(player, boolbool);
+		
+		System.out.println(" get living troops length " + server.board.getLivingTroops(playerNumber).length);
+		
 		Net_Util.send(player, server.board.getLivingTroops(playerNumber));
+		
+		
 		server.board.getPlayerTroops().get(playerNumber);
+		
 		ArrayList<Integer> spottedEnemies = new ArrayList<Integer>();
 		for(soldier troop: server.board.getPlayerTroops().get(playerNumber)){
 			for(int x: server.board.lineOfSight(troop)){
@@ -165,5 +224,6 @@ class ClientHandler implements Runnable {
 			spotted[i] = spottedEnemies.get(i);
 		}
 		Net_Util.send(player, spotted);
+		System.out.println("finished starting their turn " + System.currentTimeMillis());
 	}
 }
